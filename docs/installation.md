@@ -47,8 +47,8 @@ Where `filebrowser_data`, `filebrowser_database` and `filebrowser_config` are Do
 
 Available tags:
 
-- `latest` — the most recent build.
-- `2.63.24` (and later version tags) — pinned releases.
+- `latest` — the most recent multi-arch build.
+- `2.63.25` (and other version tags) — pinned releases.
 
 The default user that runs File Browser inside the container has UID 1000 and GID 1000. If, for one reason or another, you want to run the Docker container with a different user, please consult Docker's [user documentation](https://docs.docker.com/engine/containers/run/#user).
 
