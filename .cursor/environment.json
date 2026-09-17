@@ -1,0 +1,15 @@
+{
+  "name": "File Browser",
+  "install": "bash .cursor/install.sh",
+  "terminals": [
+    {
+      "name": "backend",
+      "command": "mkdir -p \"$HOME/fb-data\" && [ -e \"$HOME/fb-data/welcome.txt\" ] || echo 'Welcome to File Browser' > \"$HOME/fb-data/welcome.txt\"; ./filebrowser --address 0.0.0.0 --port 8080 --root \"$HOME/fb-data\" --database /tmp/filebrowser.db --noauth"
+    },
+    {
+      "name": "frontend-dev",
+      "command": "source .cursor/use-node.sh && cd frontend && pnpm run dev --host 0.0.0.0 --port 5173"
+    }
+  ],
+  "ports": [8080, 5173]
+}
