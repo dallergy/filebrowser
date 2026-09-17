@@ -1,0 +1,162 @@
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *  2026 UI refresh
+ *
+ *  A light-touch modernization layer loaded last so it overrides the base
+ *  styles without rewriting them. Focus: softer radii, layered elevation,
+ *  a refined accent, a modern system font stack, and clearer focus states.
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+body {
+  font-family:
+    "Inter", system-ui, -apple-system, "Segoe UI", "Roboto", "Helvetica Neue",
+    Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Buttons: rounder, a touch bolder, with a subtle hover lift */
+.button {
+  border-radius: var(--radius-sm);
+  border: 0;
+  box-shadow: var(--shadow-sm);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  transition:
+    0.15s ease transform,
+    0.15s ease box-shadow,
+    0.15s ease background-color;
+}
+
+.button:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.button:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+.button--flat {
+  box-shadow: none;
+}
+
+.button--flat:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.button:focus-visible {
+  box-shadow: var(--focus-ring);
+}
+
+/* Inputs: rounder with a clear focus ring */
+.input {
+  border-radius: var(--radius-sm);
+  transition:
+    0.15s ease border-color,
+    0.15s ease box-shadow;
+}
+
+.input:focus {
+  border-color: var(--blue);
+  box-shadow: var(--focus-ring);
+}
+
+/* Header: cleaner hairline + soft elevation */
+header {
+  box-shadow: var(--shadow-sm);
+  border-bottom: 1px solid var(--borderPrimary);
+  backdrop-filter: saturate(1.1);
+}
+
+/* Search box: pill-ish and elevated when active */
+#search #input {
+  border-radius: var(--radius);
+}
+
+#search .boxes {
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+#search .boxes > div > div {
+  border-radius: var(--radius-sm);
+}
+
+/* Cards & modals: larger radius and a soft, layered shadow */
+.card {
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.card.floating {
+  box-shadow: var(--shadow-lg);
+}
+
+li code,
+p code {
+  border-radius: var(--radius-sm);
+}
+
+/* Listing items: gentler corners and a smooth hover in list view */
+#listing.mosaic .item {
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  transition:
+    0.15s ease transform,
+    0.15s ease box-shadow;
+}
+
+#listing.mosaic .item:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md) !important;
+}
+
+#listing.list .item {
+  transition:
+    0.12s ease background-color,
+    0.12s ease box-shadow;
+}
+
+#listing.list .item:hover {
+  background: var(--surfaceSecondary);
+}
+
+#listing .item[aria-selected="true"] {
+  border-radius: var(--radius-sm);
+}
+
+/* Rounded selection + hover targets in prompts */
+.file-list li {
+  border-radius: var(--radius-sm);
+}
+
+/* Icon action buttons: crisp keyboard focus */
+.action:focus-visible {
+  box-shadow: var(--focus-ring);
+}
+
+/* Login: give the form a proper elevated card */
+#login form {
+  background: var(--surfacePrimary);
+  padding: 2em 1.75em;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--borderPrimary);
+}
+
+#login.recaptcha form {
+  min-width: 320px;
+}
+
+#login .wrong,
+#login .logout-message {
+  border-radius: var(--radius-sm);
+}
+
+/* Progress bar uses the refreshed accent */
+.progress div {
+  background-color: var(--blue);
+}
