@@ -1,6 +1,6 @@
 # Building File Browser
 
-This project is archived on 2026-09-01. Pull requests are not accepted and no further changes are merged. This document is kept as build documentation for anyone wishing to build the project from source.
+This document explains how to build and develop this fork of File Browser from source.
 
 ## Project Structure
 
