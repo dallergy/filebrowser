@@ -32,7 +32,7 @@ File Browser is now up and running. Read the ["First Boot"](#first-boot) section
 
 ## Docker
 
-Multi-architecture images (`linux/amd64` and `linux/arm64`) are published to [Docker Hub](https://hub.docker.com/r/shounak6942/filebrowser) as a bare Alpine image. Docker automatically pulls the variant that matches your host, so the same command works on x86-64 servers and ARM machines (Raspberry Pi 4/5, Apple Silicon, AWS Graviton, etc.).
+Multi-architecture images (`linux/amd64`, `linux/arm64` and `linux/arm/v7`) are published to [Docker Hub](https://hub.docker.com/r/shounak6942/filebrowser) as a bare Alpine image, and mirrored to the GitHub Container Registry as `ghcr.io/dallergy/filebrowser`. Docker automatically pulls the variant that matches your host, so the same command works on x86-64 servers and ARM machines (Raspberry Pi, Apple Silicon, AWS Graviton, etc.).
 
 ```sh
 docker run \
@@ -47,8 +47,10 @@ Where `filebrowser_data`, `filebrowser_database` and `filebrowser_config` are Do
 
 Available tags:
 
-- `latest` — the most recent multi-arch build.
-- `2.63.25` (and other version tags) — pinned releases.
+- `latest` — the most recent release.
+- `2.64.2`, `v2.64.2` (and other version tags) — pinned releases.
+- `v2` — the latest release of the 2.x line.
+- `s6` and `<version>-s6` — the [s6-overlay](https://github.com/just-containers/s6-overlay) variant based on LinuxServer's Alpine image (`linux/amd64` and `linux/arm64`), configured with `PUID`/`PGID`.
 
 The default user that runs File Browser inside the container has UID 1000 and GID 1000. If, for one reason or another, you want to run the Docker container with a different user, please consult Docker's [user documentation](https://docs.docker.com/engine/containers/run/#user).
 
