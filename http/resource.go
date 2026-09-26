@@ -429,7 +429,17 @@ func patchAction(ctx context.Context, action, src, dst string, d *data, fileCach
 			return err
 		}
 
-		return fileutils.MoveFile(d.user.Fs, src, dst, d.settings.FileMode, d.settings.DirMode)
+		if err := fileutils.MoveFile(d.user.Fs, src, dst, d.settings.FileMode, d.settings.DirMode); err != nil {
+			return err
+		}
+
+		// Links to the old location would otherwise come back to life, serving
+		// whatever is created there next.
+		if err := deleteSharesUnder(d, src); err != nil {
+			log.Printf("WARNING: Error(s) occurred while deleting associated shares with file: %s", err)
+		}
+
+		return nil
 	default:
 		return fmt.Errorf("unsupported action %s: %w", action, fberrors.ErrInvalidRequestParams)
 	}

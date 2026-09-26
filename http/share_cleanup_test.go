@@ -123,3 +123,20 @@ func TestDeleteRemovesOtherUsersShares(t *testing.T) {
 	}
 	f.assertShares(t, map[string]bool{"editor-y": true, "other-x": false, "other-y": false})
 }
+
+// Regression for GHSA-m8v4-4w34-rrvf: renaming a shared file left its link in
+// place, so it silently came back to life, publicly serving whatever was later
+// created at the old path.
+func TestRenameRemovesShares(t *testing.T) {
+	f := newShareCleanupFixture(t)
+
+	rec := f.serve(t, resourcePatchHandler(diskcache.NewNoOp()), http.MethodPatch, "/editor/x.txt?action=rename&destination=%2Feditor%2Fz.txt")
+	if rec.Code != http.StatusOK {
+		t.Fatalf("PATCH rename = %d body=%q; want 200", rec.Code, rec.Body.String())
+	}
+	if _, err := os.Stat(filepath.Join(f.root, "editor", "z.txt")); err != nil {
+		t.Fatalf("rename did not happen: %v", err)
+	}
+
+	f.assertShares(t, map[string]bool{"editor-x": false, "editor-y": true, "other-x": true, "other-y": true})
+}
