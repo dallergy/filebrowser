@@ -1,13 +1,15 @@
 services:
   filebrowser:
     container_name: filebrowser
-    image: filebrowser/filebrowser:latest
+    image: shounak6942/filebrowser:latest
     networks:
       - filebrowser
     ports:
       - 8000:80
     volumes:
-      - filebrowser:/flux/vault
+      - filebrowser_data:/srv
+      - filebrowser_database:/database
+      - filebrowser_config:/config
     environment:
       - FB_REDIS_CACHE_URL=redis://default:filebrowser@redis:6379 # Use rediss:// for ssl
 
@@ -29,4 +31,6 @@ networks:
   filebrowser:
 
 volumes:
-  filebrowser:
+  filebrowser_data:
+  filebrowser_database:
+  filebrowser_config:

@@ -46,9 +46,9 @@ You can do this by adding them in Settings > User Management > (edit user) > Com
 
 > [!NOTE]
 > 
-> If using Docker and you want to add a new command that is not in the base image then you will need to build a custom Docker image using `filebrowser/filebrowser` as a base image.  For example to add 7z:
+> If using Docker and you want to add a new command that is not in the base image then you will need to build a custom Docker image using `shounak6942/filebrowser` as a base image.  For example to add 7z:
 > 
 > ```docker
-> FROM filebrowser/filebrowser
+> FROM shounak6942/filebrowser
 > RUN sudo apt install p7zip-full
 > ```

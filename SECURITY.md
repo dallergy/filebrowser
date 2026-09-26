@@ -20,7 +20,7 @@ To avoid duplicates, first check the existing issues and advisories, and confirm
 ## Reporting a Vulnerability
 
 Please report vulnerabilities privately through the repository's GitHub
-[Security](https://github.com/shounak6942/filebrowser/security) page rather than
+[Security](https://github.com/dallergy/filebrowser/security) page rather than
 opening a public issue.
 
 Please include, where possible:
