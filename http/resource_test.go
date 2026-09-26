@@ -257,3 +257,56 @@ func TestResourcePostRunsUploadHooksForDirectories(t *testing.T) {
 		t.Fatalf("expected directory to be created before its after hook, got %v", err)
 	}
 }
+
+// Regression for GHSA-c4fr-5f24-4wrj: an upload that targets an existing
+// directory must be rejected up front. Writing to a directory fails, and the
+// failure cleanup used to RemoveAll the request path, letting a user without
+// Perm.Delete wipe the whole tree, rule-denied descendants included.
+func TestResourcePostDoesNotDeleteDirectoryTarget(t *testing.T) {
+	userScope := t.TempDir()
+	team := filepath.Join(userScope, "shared", "team")
+	if err := os.MkdirAll(team, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	keep := filepath.Join(team, "keep.txt")
+	if err := os.WriteFile(keep, []byte("keep"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	existing := filepath.Join(userScope, "existing.txt")
+	if err := os.WriteFile(existing, []byte("old"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	key := []byte("test-signing-key")
+	// The default preset for new users: no Perm.Delete.
+	perm := users.Permissions{Create: true, Modify: true}
+	st := scopedUserStorage(t, userScope, perm, key)
+	signed := signToken(t, perm, key)
+
+	post := func(path, body string) *httptest.ResponseRecorder {
+		req, _ := http.NewRequest(http.MethodPost, path, strings.NewReader(body))
+		req.Header.Set("X-Auth", signed)
+		rec := httptest.NewRecorder()
+		handle(resourcePostHandler(diskcache.NewNoOp()), "", st, &settings.Server{}).ServeHTTP(rec, req)
+		return rec
+	}
+
+	t.Run("directory target is rejected and kept", func(t *testing.T) {
+		rec := post("/shared/team?override=true", "x")
+		if rec.Code != http.StatusBadRequest {
+			t.Errorf("POST over a directory = %d; want 400", rec.Code)
+		}
+		if _, err := os.Stat(keep); err != nil {
+			t.Fatalf("VULNERABLE: directory contents deleted by the upload cleanup: %v", err)
+		}
+	})
+
+	t.Run("overwriting a file still works", func(t *testing.T) {
+		if rec := post("/existing.txt?override=true", "new"); rec.Code != http.StatusOK {
+			t.Fatalf("POST over a file = %d body=%q; want 200", rec.Code, rec.Body.String())
+		}
+		if data, _ := os.ReadFile(existing); string(data) != "new" {
+			t.Errorf("file content = %q; want %q", data, "new")
+		}
+	})
+}
