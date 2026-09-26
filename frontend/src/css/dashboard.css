@@ -33,23 +33,27 @@ a {
 }
 
 .dashboard p label {
-  margin-bottom: 0.2em;
+  margin-bottom: 0.35em;
   display: block;
-  font-size: 0.8em;
+  font-size: 0.8125rem;
   font-weight: 500;
-  color: var(--textPrimary);
+  color: var(--textSecondary);
 }
 
 li code,
 p code {
-  background: var(--divider);
-  padding: 0.1em;
-  border-radius: 0.2em;
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  background: var(--surfaceSecondary);
+  border: 1px solid var(--borderPrimary);
+  padding: 0.1em 0.35em;
+  border-radius: var(--radius-sm);
 }
 
 .small {
-  font-size: 0.8em;
-  line-height: 1.5;
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: var(--textPrimary);
 }
 
 .dashboard #nav {
@@ -61,7 +65,7 @@ p code {
 .dashboard #nav .wrapper {
   display: flex;
   flex-grow: 1;
-  border-bottom: 2px solid var(--divider);
+  border-bottom: 1px solid var(--borderPrimary);
 }
 
 html[dir="rtl"] .dashboard #nav .wrapper {
@@ -71,41 +75,33 @@ html[dir="rtl"] .dashboard #nav .wrapper {
 .dashboard #nav ul {
   list-style: none;
   display: flex;
-  color: var(--action);
+  gap: 0.25em;
+  color: var(--textPrimary);
   font-weight: 500;
   padding: 0;
-  margin: 0 0 -2px 0;
-  font-size: 0.8em;
+  margin: 0 0 -1px 0;
+  font-size: 0.875rem;
   text-align: center;
   justify-content: left;
 }
 
 .dashboard #nav ul li {
   position: relative;
-  padding: 1.5em 2em;
+  padding: 0.9em 0.75em;
   white-space: nowrap;
   border-bottom: 2px solid transparent;
-  transition: 0.1s ease-in-out all;
+  transition:
+    color 0.15s var(--ease),
+    border-color 0.15s var(--ease);
 }
 
 .dashboard #nav ul li:hover {
-  background: var(--surfaceSecondary);
+  color: var(--textSecondary);
 }
 
 .dashboard #nav ul li.active {
-  border-color: var(--blue);
-  color: var(--blue);
-}
-
-.dashboard #nav ul li.active::before {
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
-  content: "";
-  background: var(--blue);
-  opacity: 0.08;
+  border-color: var(--textSecondary);
+  color: var(--textSecondary);
 }
 
 .dashboard #nav i {
@@ -118,8 +114,12 @@ table {
   width: 100%;
 }
 
+table {
+  font-size: 0.875rem;
+}
+
 table tr {
-  border-bottom: 1px solid var(--iconTertiary);
+  border-bottom: 1px solid var(--borderPrimary);
 }
 
 table tr:last-child {
@@ -127,14 +127,15 @@ table tr:last-child {
 }
 
 table th {
+  font-size: 0.75rem;
   font-weight: 500;
-  color: var(--textSecondary);
+  color: var(--textPrimary);
   text-align: left;
 }
 
 table th,
 table td {
-  padding: 0.5em 0;
+  padding: 0.65em 0;
 }
 
 table td.small {
@@ -161,12 +162,11 @@ table tr > *:last-child {
   margin: 0 0 1rem 0;
   background: var(--surfacePrimary);
   color: var(--textSecondary);
-  border-radius: 2px;
-  box-shadow:
-    0 2px 2px 0 rgba(0, 0, 0, 0.14),
-    0 1px 5px 0 rgba(0, 0, 0, 0.12),
-    0 3px 1px -2px rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--borderPrimary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
   overflow: auto;
+  font-size: 0.9375rem;
 }
 
 .card.floating {
@@ -174,11 +174,23 @@ table tr > *:last-child {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  max-width: 25em;
+  max-width: 26em;
   width: 90%;
   max-height: 95%;
-  /* animation-duration: 0.3s;
-  animation-fill-mode: forwards; */
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  animation: 0.18s var(--ease) dialog-in;
+}
+
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, calc(-50% + 6px)) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
 }
 
 .card > * > *:first-child {
@@ -190,8 +202,9 @@ table tr > *:last-child {
 }
 
 .card .card-title {
-  padding: 1.5em 1em 1em;
+  padding: 1.25em 1.25em 0.75em;
   display: flex;
+  align-items: center;
 }
 
 .card .card-title > *:first-child {
@@ -204,15 +217,15 @@ html[dir="rtl"] .card .card-title > *:first-child {
 }
 
 .card > div {
-  padding: 1em 1em;
+  padding: 0.75em 1.25em;
 }
 
 .card > div:first-child {
-  padding-top: 1.5em;
+  padding-top: 1.25em;
 }
 
 .card > div:last-child {
-  padding-bottom: 1.5em;
+  padding-bottom: 1.25em;
 }
 
 .card .card-title * {
@@ -220,11 +233,44 @@ html[dir="rtl"] .card .card-title > *:first-child {
 }
 
 .card .card-action {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5em;
   text-align: right;
+}
+
+.card .card-action > .button {
+  margin: 0;
+}
+
+/* The last action of a dialog is its primary one. */
+.card .card-action .button--flat:last-child:not(.button--grey) {
+  color: #fff;
+  background: var(--blue);
+  box-shadow: var(--shadow-sm);
+}
+
+.card .card-action .button--flat:last-child:not(.button--grey):hover {
+  background: var(--dark-blue);
+}
+
+.card .card-action .button--flat.button--red:last-child {
+  background: var(--red);
+}
+
+.card .card-action .button--flat.button--red:last-child:hover {
+  background: var(--dark-red);
+}
+
+.card .card-action .button--flat:last-child[disabled]:not(.button--grey),
+.card .card-action .button--flat:last-child[disabled]:not(.button--grey):hover {
+  background: var(--blue);
 }
 
 body.rtl .card .card-action {
   text-align: left;
+  justify-content: flex-start;
 }
 
 .card .card-content.full {
@@ -233,19 +279,32 @@ body.rtl .card .card-action {
 }
 
 .card h2 {
-  font-weight: 500;
+  font-size: 1.0625rem;
+  font-weight: 600;
 }
 
 .card h3 {
-  color: var(--textPrimary);
-  font-size: 1em;
-  font-weight: 500;
-  margin: 2em 0 1em;
+  color: var(--textSecondary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin: 1.75em 0 0.75em;
+}
+
+.card p {
+  line-height: 1.6;
+}
+
+.card p > input[type="checkbox"],
+.card p > label > input[type="checkbox"] {
+  width: 1rem;
+  height: 1rem;
+  margin: 0 0.5em 0 0;
+  vertical-align: -0.15em;
 }
 
 .card-content table {
-  margin: 0 -1em;
-  width: calc(100% + 2em);
+  margin: 0 -1.25em;
+  width: calc(100% + 2.5em);
 }
 
 .card code {
@@ -288,9 +347,10 @@ body.rtl .card .card-action {
 
 .card#share ul li input,
 .card#share ul li select {
-  padding: 0.2em;
+  padding: 0.35em 0.5em;
   margin-right: 0.5em;
   border: 1px solid var(--borderPrimary);
+  border-radius: var(--radius-sm);
 }
 
 .card#share .action.copy-clipboard::after {
@@ -300,10 +360,10 @@ body.rtl .card .card-action {
   width: 150%;
   font-size: 0.6em;
   text-align: center;
-  background: #44a6f5;
-  color: #fff;
+  background: var(--textSecondary);
+  color: var(--background);
   padding: 0.5em 0.2em;
-  border-radius: 0.4em;
+  border-radius: var(--radius-sm);
   top: -2em;
   transition: 0.1s ease opacity;
   opacity: 0;
@@ -326,7 +386,9 @@ body.rtl .card .card-action {
 }
 
 .overlay {
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: var(--overlay);
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
   position: fixed;
   top: 0;
   left: 0;
@@ -351,36 +413,41 @@ body.rtl .card .card-action {
   width: 100%;
 }
 
+.file-list {
+  border: 1px solid var(--borderPrimary);
+  border-radius: var(--radius);
+  padding: 0.25em;
+}
+
 .file-list li {
+  display: flex;
+  align-items: center;
   width: 100%;
   user-select: none;
-  border-radius: 0.2em;
-  padding: 0.3em;
+  border-radius: var(--radius-sm);
+  padding: 0.35em 0.5em;
+  font-size: 0.875rem;
 }
 
 .file-list li[aria-selected="true"] {
-  background: var(--blue) !important;
-  color: var(--iconSecondary) !important;
+  background: var(--accent-soft) !important;
+  color: var(--textSecondary) !important;
   transition: 0.1s ease all;
 }
 
 .file-list li:hover {
-  background: var(--surfaceSecondary);
+  background: var(--hover);
   cursor: pointer;
 }
 
 .file-list li:before {
   content: "folder";
-  color: var(--textPrimary);
+  color: var(--icon-blue);
   vertical-align: middle;
-  line-height: 1.4;
+  line-height: 1;
   font-family: "Material Icons";
-  font-size: 1.75em;
-  margin-right: 0.25em;
-}
-
-.file-list li[aria-selected="true"]:before {
-  color: var(--iconSecondary);
+  font-size: 1.35em;
+  margin-right: 0.5em;
 }
 
 .help {
@@ -431,7 +498,8 @@ body.rtl .card .card-action {
 
 .collapsible > label * {
   margin: 0;
-  color: var(--textPrimary);
+  color: var(--textSecondary);
+  font-weight: 500;
 }
 
 .collapsible > label i {
@@ -456,16 +524,16 @@ body.rtl .card .card-action {
 }
 
 .card .collapsible {
-  width: calc(100% + 2em);
-  margin: 0 -1em;
+  width: calc(100% + 2.5em);
+  margin: 0 -1.25em;
 }
 
 .card .collapsible > label {
-  padding: 1em;
+  padding: 0.9em 1.25em;
 }
 
 .card .collapsible .collapse {
-  padding: 0 1em;
+  padding: 0 1.25em;
 }
 
 .card .card-action.full {
@@ -476,10 +544,15 @@ body.rtl .card .card-action {
 
 .card .card-action.full .action {
   flex: 1;
-  padding: 2em;
-  border-radius: 0.2em;
+  padding: 1.5em;
+  border-radius: var(--radius-lg);
   border: 1px solid var(--borderPrimary);
   text-align: center;
+}
+
+.card .card-action.full .action:hover {
+  border-color: var(--borderSecondary);
+  background: var(--hover);
 }
 
 .card .card-action.full .action {
@@ -490,12 +563,14 @@ body.rtl .card .card-action {
   display: block;
   padding: 0;
   margin-bottom: 0.25em;
-  font-size: 4em;
+  font-size: 2.5em;
+  color: var(--blue);
 }
 
 .card .card-action.full .action .title {
-  font-size: 1.5em;
+  font-size: 1em;
   font-weight: 500;
+  color: var(--textSecondary);
 }
 
 /*** RTL - Fix disk usage information (in english) ***/

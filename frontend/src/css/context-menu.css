@@ -1,21 +1,44 @@
 .context-menu {
   position: absolute;
+  padding: 0.3em;
   background: var(--surfacePrimary);
-  min-width: 180px;
-  max-width: 220px;
-  border: 1px solid var(--borderSecondary);
-  box-shadow: 0 2px 4px var(--borderPrimary);
+  min-width: 190px;
+  max-width: 240px;
+  border: 1px solid var(--borderPrimary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
   z-index: 999;
+  animation: 0.12s var(--ease) menu-in;
+}
+
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .context-menu .action {
-  display: block;
-  width: 100%;
-  border-radius: 0;
   display: flex;
   align-items: center;
+  gap: 0.25em;
+  width: 100%;
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  color: var(--textSecondary);
+}
+
+.context-menu .action i {
+  font-size: 1.25rem;
+  color: var(--textPrimary);
 }
 
 .context-menu .action .counter {
-  left: 1.75em;
+  left: 1.6em;
+  right: auto;
+  bottom: 0.15em;
 }

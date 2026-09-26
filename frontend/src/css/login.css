@@ -1,23 +1,28 @@
 #login {
-  background: var(--surfacePrimary);
+  background:
+    radial-gradient(60em 30em at 50% -10%, var(--accent-soft), transparent 70%),
+    var(--background);
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
+  overflow: auto;
 }
 
 #login img {
-  width: 4em;
-  height: 4em;
+  width: 3em;
+  height: 3em;
   margin: 0 auto;
   display: block;
 }
 
 #login h1 {
   text-align: center;
-  font-size: 2.5em;
-  margin: 0.4em 0 0.67em;
+  font-size: 1.375rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin: 0.75em 0 1.25em;
 }
 
 #login form {
@@ -25,8 +30,23 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  max-width: 16em;
-  width: 90%;
+  max-width: 22em;
+  width: calc(100% - 2em);
+  padding: 2.25em 2em 2em;
+  background: var(--surfacePrimary);
+  border: 1px solid var(--borderPrimary);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+}
+
+#login form .input--block {
+  min-height: 2.5rem;
+  margin-bottom: 0.75em;
+}
+
+#login form .button--block {
+  min-height: 2.5rem;
+  margin: 0.5em 0 0;
 }
 
 #login.recaptcha form {
@@ -37,20 +57,24 @@
   margin: 0.5em 0 0;
 }
 
-#login .wrong {
-  background: var(--red);
-  color: #fff;
-  padding: 0.5em;
+#login .wrong,
+#login .logout-message {
+  padding: 0.6em 0.75em;
+  margin: 0 0 1em;
+  font-size: 0.875rem;
   text-align: center;
+  border-radius: var(--radius);
   animation: 0.2s opac forwards;
 }
 
+#login .wrong {
+  background: var(--red-soft);
+  color: var(--red);
+}
+
 #login .logout-message {
-  background: var(--icon-orange);
-  color: #fff;
-  padding: 0.5em;
-  text-align: center;
-  animation: 0.2s opac forwards;
+  background: rgba(247, 107, 21, 0.12);
+  color: var(--icon-orange);
   text-transform: none;
 }
 
@@ -65,10 +89,13 @@
 
 #login p {
   cursor: pointer;
-  text-align: right;
+  text-align: center;
   color: var(--blue);
-  text-transform: lowercase;
   font-weight: 500;
-  font-size: 0.9rem;
-  margin: 0.5rem 0;
+  font-size: 0.875rem;
+  margin: 1em 0 0;
+}
+
+#login p.logout-message {
+  cursor: default;
 }
