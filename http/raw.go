@@ -91,11 +91,6 @@ var rawHandler = withUser(func(w http.ResponseWriter, r *http.Request, d *data) 
 		return errToStatus(err), err
 	}
 
-	if files.IsNamedPipe(file.Mode) {
-		setContentDisposition(w, r, file)
-		return 0, nil
-	}
-
 	if !file.IsDir {
 		return rawFileHandler(w, r, file)
 	}
@@ -111,6 +106,12 @@ func getFiles(d *data, path, commonPath string) ([]archives.FileInfo, error) {
 	info, err := d.user.Fs.Stat(path)
 	if err != nil {
 		return nil, err
+	}
+
+	// Leave named pipes, sockets and devices out of the archive: opening a pipe
+	// with no writer blocks forever, pinning the request.
+	if isIrregular(info) {
+		return nil, nil
 	}
 
 	var archiveFiles []archives.FileInfo
@@ -216,7 +217,22 @@ func rawDirHandler(w http.ResponseWriter, r *http.Request, d *data, file *files.
 	return 0, nil
 }
 
+// isIrregular reports whether info, which must come from a Stat that follows
+// symlinks, describes something other than a regular file or a directory: a
+// named pipe, socket or device. Opening a pipe with no writer blocks forever and
+// a device may never reach EOF, so their contents are never served.
+func isIrregular(info fs.FileInfo) bool {
+	return !info.IsDir() && !info.Mode().IsRegular()
+}
+
 func rawFileHandler(w http.ResponseWriter, r *http.Request, file *files.FileInfo) (int, error) {
+	// Stat rather than trust file.Mode, which describes the link itself when
+	// the file is a symlink.
+	if info, err := file.Fs.Stat(file.Path); err == nil && isIrregular(info) {
+		setContentDisposition(w, r, file)
+		return 0, nil
+	}
+
 	fd, err := file.Fs.Open(file.Path)
 	if err != nil {
 		return http.StatusInternalServerError, err

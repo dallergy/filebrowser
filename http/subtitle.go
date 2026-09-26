@@ -52,6 +52,10 @@ func subtitleFileHandler(w http.ResponseWriter, r *http.Request, file *files.Fil
 		return http.StatusBadRequest, nil
 	}
 
+	if info, err := file.Fs.Stat(file.Path); err == nil && isIrregular(info) {
+		return http.StatusBadRequest, nil
+	}
+
 	fd, err := file.Fs.Open(file.Path)
 	if err != nil {
 		return http.StatusInternalServerError, err
