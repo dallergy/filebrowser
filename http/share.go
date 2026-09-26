@@ -134,6 +134,50 @@ func getSharesForAdminPath(d *data, path string) ([]*share.Link, error) {
 	return filtered, nil
 }
 
+// deleteSharesUnder removes every share link, whoever owns it, that points at
+// path in d.user's scope or at anything below it. Share paths are stored
+// relative to their owner's scope, so links are matched by where they land on
+// disk rather than by the path as the acting user sees it.
+func deleteSharesUnder(d *data, path string) error {
+	links, err := d.store.Share.All()
+	if errors.Is(err, fberrors.ErrNotExist) {
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+
+	target := filepath.Clean(d.user.FullPath(path))
+	prefix := target
+	if !strings.HasSuffix(prefix, string(filepath.Separator)) {
+		prefix += string(filepath.Separator)
+	}
+
+	var errs error
+	owners := make(map[uint]*users.User)
+	for _, link := range links {
+		owner, ok := owners[link.UserID]
+		if !ok {
+			owner, err = d.store.Users.Get(d.server.Root, d.server.FollowExternalSymlinks, link.UserID)
+			if err != nil && !errors.Is(err, fberrors.ErrNotExist) {
+				errs = errors.Join(errs, err)
+				continue
+			}
+			owners[link.UserID] = owner // owner is nil on ErrNotExist
+		}
+		if owner == nil {
+			continue
+		}
+
+		linkPath := filepath.Clean(owner.FullPath(link.Path))
+		if linkPath == target || strings.HasPrefix(linkPath, prefix) {
+			errs = errors.Join(errs, d.store.Share.Delete(link.Hash))
+		}
+	}
+
+	return errs
+}
+
 var shareDeleteHandler = withPermShare(func(_ http.ResponseWriter, r *http.Request, d *data) (int, error) {
 	hash := strings.TrimSuffix(r.URL.Path, "/")
 	hash = strings.TrimPrefix(hash, "/")
