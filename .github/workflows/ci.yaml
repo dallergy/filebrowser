@@ -110,7 +110,10 @@ jobs:
           cache-dependency-path: "frontend/pnpm-lock.yaml"
       - name: Install Task
         uses: go-task/setup-task@v2
+      # Static, like the release binaries: the image has no C library to link against.
       - run: task build
+        env:
+          CGO_ENABLED: "0"
       - name: Build Docker image
         run: |
           ctx="$(mktemp -d)"
