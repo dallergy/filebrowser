@@ -2,12 +2,17 @@
   <div v-show="active" @click="closeHovers" class="overlay"></div>
   <nav :class="{ active }">
     <template v-if="isLoggedIn">
-      <button @click="toAccountSettings" class="action">
+      <button
+        @click="toAccountSettings"
+        class="action"
+        :class="{ active: $route.path.startsWith('/settings/profile') }"
+      >
         <i class="material-icons">person</i>
         <span>{{ user.username }}</span>
       </button>
       <button
         class="action"
+        :class="{ active: $route.path.startsWith('/files') }"
         @click="toRoot"
         :aria-label="$t('sidebar.myFiles')"
         :title="$t('sidebar.myFiles')"
@@ -41,6 +46,11 @@
       <div v-if="user.perm.admin">
         <button
           class="action"
+          :class="{
+            active:
+              $route.path.startsWith('/settings') &&
+              !$route.path.startsWith('/settings/profile'),
+          }"
           @click="toGlobalSettings"
           :aria-label="$t('sidebar.settings')"
           :title="$t('sidebar.settings')"
@@ -85,13 +95,14 @@
       </router-link>
     </template>
 
-    <div
-      class="credits"
-      v-if="isFiles && !disableUsedPercentage"
-      style="width: 90%; margin: 2em 2.5em 3em 2.5em"
-    >
-      <progress-bar :val="usage.usedPercentage" size="small"></progress-bar>
-      <br />
+    <div class="usage" v-if="isFiles && !disableUsedPercentage">
+      <progress-bar
+        :val="usage.usedPercentage"
+        size="small"
+        bg-color="var(--surfaceSecondary)"
+        bar-color="var(--blue)"
+        :bar-border-radius="4"
+      ></progress-bar>
       {{ $t("sidebar.diskUsed", { used: usage.used, total: usage.total }) }}
     </div>
 

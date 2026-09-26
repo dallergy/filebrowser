@@ -12,24 +12,24 @@
 }
 
 .share__box {
-  box-shadow:
-    rgba(0, 0, 0, 0.06) 0px 1px 3px,
-    rgba(0, 0, 0, 0.12) 0px 1px 2px;
   background: var(--surfacePrimary);
-  color: var(--textPrimary);
-  border-radius: 0.2em;
-  margin: 5px;
+  color: var(--textSecondary);
+  border: 1px solid var(--borderPrimary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  margin: 0.5em;
   overflow: hidden;
 }
 
 .share__box__header {
   padding: 1em;
   text-align: center;
+  font-weight: 600;
 }
 
 .share__box__icon i {
-  font-size: 10em;
-  color: #40c4ff;
+  font-size: 6em;
+  color: var(--icon-blue);
 }
 
 .share__box__center {
@@ -41,9 +41,10 @@
 }
 
 .share__box__element {
-  padding: 1em;
+  padding: 1em 1.25em;
   border-top: 1px solid var(--borderPrimary);
   word-break: break-all;
+  font-size: 0.875rem;
 }
 
 .share__box__element .button {
@@ -62,9 +63,7 @@
 
 .share__box__items #listing.list .item {
   cursor: pointer;
-  border-left: 0;
-  border-right: 0;
-  border-bottom: 0;
+  border-radius: 0;
   border-top: 1px solid var(--borderPrimary);
 }
 
@@ -77,9 +76,11 @@
 }
 
 .share__wrong__password {
-  background: var(--red);
-  color: #fff;
-  padding: 0.5em;
+  background: var(--red-soft);
+  color: var(--red);
+  border-radius: var(--radius);
+  padding: 0.6em 0.75em;
+  font-size: 0.875rem;
   text-align: center;
   animation: 0.2s opac forwards;
 }

@@ -8,6 +8,7 @@ import (
 
 	"github.com/tomasen/realip"
 
+	"github.com/filebrowser/filebrowser/v2/files"
 	"github.com/filebrowser/filebrowser/v2/rules"
 	"github.com/filebrowser/filebrowser/v2/runner"
 	"github.com/filebrowser/filebrowser/v2/settings"
@@ -46,6 +47,27 @@ func (d *data) Check(path string) bool {
 // Check, it ignores HideDotfiles: hiding dotfiles is a display preference, so
 // it must not stop a user from operating on a tree that contains one.
 func (d *data) CheckRules(path string) bool {
+	if !d.rulesAllow(path) {
+		return false
+	}
+
+	if len(d.settings.Rules) == 0 && len(d.user.Rules) == 0 {
+		return true
+	}
+
+	// Rules are matched against the path as requested, but the filesystem
+	// follows symbolic links, so an in-scope link would otherwise let a user
+	// reach a denied path under an allowed alias. Hold the path the request
+	// really lands on to the same rules.
+	if resolved, ok := files.ResolvePath(d.user.Fs, path); ok && resolved != slashClean(path) {
+		return d.rulesAllow(resolved)
+	}
+
+	return true
+}
+
+// rulesAllow evaluates the global and user rules against path as written.
+func (d *data) rulesAllow(path string) bool {
 	path = d.rulePath(path)
 
 	allow := true

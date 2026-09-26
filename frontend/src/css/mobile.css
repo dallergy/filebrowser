@@ -41,17 +41,24 @@
   header .overlay {
     width: 100%;
     height: 100%;
-    background-color: var(--borderPrimary);
+    background-color: var(--overlay);
   }
   #dropdown {
     position: fixed;
-    top: 1em;
-    right: 1em;
+    top: 0.75em;
+    right: 0.75em;
     display: block;
-    background: var(--surfaceSecondary);
-    box-shadow: 0 0 5px var(--borderPrimary);
+    min-width: 13em;
+    padding: 0.3em;
+    background: var(--surfacePrimary);
+    border: 1px solid var(--borderPrimary);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
     transform: scale(0);
-    transition: 0.1s ease-in-out transform;
+    opacity: 0;
+    transition:
+      0.15s var(--ease) transform,
+      0.15s var(--ease) opacity;
     transform-origin: top right;
     z-index: 99999;
   }
@@ -67,19 +74,26 @@
   }
   #dropdown.active {
     transform: scale(1);
+    opacity: 1;
   }
   #dropdown .action {
     display: flex;
     align-items: center;
-    border-radius: 0;
+    border-radius: var(--radius-sm);
     width: 100%;
+    color: var(--textSecondary);
+  }
+  #dropdown .action i {
+    color: var(--textPrimary);
   }
   #dropdown .action span:not(.counter) {
     display: inline-block;
     padding: 0.4em;
+    font-size: 0.875rem;
   }
   #dropdown .counter {
-    left: 2.25em;
+    left: 2em;
+    right: auto;
   }
   #file-selection {
     position: fixed;
@@ -88,13 +102,17 @@
     transform: translateX(-50%);
     display: flex;
     align-items: center;
-    background: var(--surfaceSecondary);
-    box-shadow:
-      rgba(0, 0, 0, 0.06) 0px 1px 3px,
-      rgba(0, 0, 0, 0.12) 0px 1px 2px;
-    width: 95%;
-    max-width: 20em;
+    padding: 0.25em;
+    background: var(--surfacePrimary);
+    border: 1px solid var(--borderPrimary);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    width: calc(100% - 2em);
+    max-width: 22em;
     z-index: 1;
+  }
+  #file-selection:empty {
+    display: none;
   }
   #file-selection .action {
     border-radius: 50%;
@@ -102,8 +120,10 @@
   }
   #file-selection > span {
     display: inline-block;
-    margin-left: 1em;
-    color: var(--textPrimary);
+    margin-left: 0.75em;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--textSecondary);
     margin-right: auto;
   }
   #file-selection .action span {
@@ -112,18 +132,21 @@
   nav {
     top: 0;
     z-index: 99999;
-    background: var(--surfaceSecondary);
+    background: var(--surfacePrimary);
+    border-right: 1px solid var(--borderPrimary);
     height: 100vh;
-    width: 16em;
+    height: 100dvh;
+    width: 17em;
     overflow-y: auto;
-    box-shadow: 0 0 5px var(--borderPrimary);
-    transition: 0.1s ease left;
-    left: -17em;
+    padding-top: 1em;
+    box-shadow: var(--shadow-lg);
+    transition: 0.2s var(--ease) left;
+    left: -18em;
   }
 
   html[dir="rtl"] nav {
     left: unset;
-    right: -17em;
+    right: -18em;
   }
   nav.active {
     left: 0;
@@ -166,8 +189,8 @@
   }
 
   main {
-    margin: 0 1em;
-    width: calc(100% - 2em);
+    margin: 0 0.75em;
+    width: calc(100% - 1.5em);
   }
   #search {
     display: none;

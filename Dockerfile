@@ -1,5 +1,5 @@
 ## Multistage build: First stage fetches dependencies
-FROM alpine:3.23 AS fetcher
+FROM alpine:3.24 AS fetcher
 
 # install and copy ca-certificates, mailcap, and tini-static; download JSON.sh
 RUN apk update && \
@@ -8,6 +8,9 @@ RUN apk update && \
 
 ## Second stage: Use lightweight BusyBox image for final runtime environment
 FROM busybox:1.37.0-musl
+
+# The build context holds one binary per platform, at <os>/<arch>[/<variant>]
+ARG TARGETPLATFORM
 
 # Define non-root user UID and GID
 ENV UID=1000
@@ -18,7 +21,7 @@ RUN addgroup -g $GID user && \
     adduser -D -u $UID -G user user
 
 # Copy binary, scripts, and configurations into image with proper ownership
-COPY --chown=user:user filebrowser /bin/filebrowser
+COPY --chown=user:user $TARGETPLATFORM/filebrowser /bin/filebrowser
 COPY --chown=user:user docker/common/ /
 COPY --chown=user:user docker/alpine/ /
 COPY --chown=user:user --from=fetcher /sbin/tini-static /bin/tini

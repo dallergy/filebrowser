@@ -1,17 +1,28 @@
 header {
   z-index: 1000;
-  background: var(--surfacePrimary);
-  border-bottom: 1px solid var(--divider);
-  box-shadow: 0 0 5px var(--borderPrimary);
+  border-bottom: 1px solid var(--borderPrimary);
   position: fixed;
   top: 0;
   left: 0;
   height: 4em;
   width: 100%;
-  padding: 0;
   display: flex;
-  padding: 0.5em 0.5em 0.5em 1em;
+  gap: 0.25em;
+  padding: 0.5em 1em 0.5em 1.25em;
   align-items: center;
+}
+
+/* The frosted background lives on a pseudo-element: a backdrop-filter on the
+ * header itself would make it the containing block of its fixed-position
+ * children (the search overlay, the mobile menu), clipping them to its box. */
+header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--surfaceTranslucent);
+  -webkit-backdrop-filter: saturate(1.8) blur(12px);
+  backdrop-filter: saturate(1.8) blur(12px);
 }
 
 header > * {
@@ -21,10 +32,13 @@ header > * {
 header title {
   display: block;
   flex: 1 1 auto;
-  padding: 0 1em;
+  padding: 0 0.75em;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-size: 1.2em;
+  white-space: nowrap;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 header .overlay {
@@ -43,7 +57,8 @@ header img {
 }
 
 header img {
-  height: 2.5em;
+  height: 2em;
+  margin-left: 0.25em;
 }
 
 header .action span {
@@ -66,9 +81,9 @@ header .menu-button {
 
 #search {
   position: relative;
-  height: 100%;
+  height: 2.5em;
   width: 100%;
-  max-width: 25em;
+  max-width: 28em;
 }
 
 #search.active {
@@ -83,25 +98,45 @@ header .menu-button {
 
 #search #input {
   background: var(--surfaceSecondary);
-  border-color: var(--surfacePrimary);
+  border: 1px solid transparent;
   display: flex;
+  gap: 0.5em;
   height: 100%;
-  padding: 0em 0.75em;
-  border-radius: 0.3em;
-  transition: 0.1s ease all;
+  padding: 0 0.75em;
+  border-radius: var(--radius);
+  transition:
+    border-color 0.15s var(--ease),
+    background-color 0.15s var(--ease),
+    box-shadow 0.15s var(--ease);
   align-items: center;
   z-index: 2;
+  cursor: text;
+}
+
+#search:not(.active) #input:hover {
+  border-color: var(--borderPrimary);
+}
+
+#search #input > i {
+  font-size: 1.25rem;
+  color: var(--textPrimary);
+}
+
+#search #input input {
+  font-size: 0.875rem;
 }
 
 #search #input input::placeholder {
-  color: var(--textSecondary);
+  color: var(--textPrimary);
 }
 
 #search.active #input {
+  border: 0;
   border-bottom: 1px solid var(--borderPrimary);
-  box-shadow: 0 0 5px var(--borderPrimary);
+  border-radius: 0;
   background: var(--surfacePrimary);
   height: 4em;
+  padding: 0 1em;
 }
 
 #search.active > div {
@@ -110,12 +145,15 @@ header .menu-button {
 
 #search.active i,
 #search.active input {
-  color: var(--textPrimary);
+  color: var(--textSecondary);
+}
+
+#search.active #input input {
+  font-size: 1rem;
 }
 
 #search #input > .action,
 #search #input > i {
-  margin-right: 0.3em;
   user-select: none;
 }
 
@@ -124,12 +162,14 @@ header .menu-button {
   border: 0;
   background-color: transparent;
   padding: 0;
+  color: var(--textSecondary);
 }
 
 #search #result {
   visibility: visible;
   max-height: none;
   background: var(--background);
+  font-size: 0.875rem;
   text-align: left;
   padding: 0;
   color: var(--textPrimary);
@@ -161,7 +201,7 @@ html[dir="rtl"] #search #result ul > * {
 }
 
 #search.active #result {
-  padding: 0.5em;
+  padding: 1em;
   height: calc(100% - 4em);
 }
 
@@ -172,7 +212,7 @@ html[dir="rtl"] #search #result ul > * {
 }
 
 #search li {
-  margin-bottom: 0.5em;
+  margin-bottom: 0.125em;
 }
 
 #search #result > div {
@@ -205,11 +245,19 @@ html[dir="rtl"] #search #result ul > * {
 #search.active #result ul li a {
   display: flex;
   align-items: center;
-  padding: 0.3em 0;
+  gap: 0.5em;
+  padding: 0.5em 0.75em;
+  border-radius: var(--radius);
+  color: var(--textSecondary);
+}
+
+#search.active #result ul li a:hover {
+  background: var(--hover);
 }
 
 #search.active #result ul li a i {
-  margin-right: 0.3em;
+  font-size: 1.25rem;
+  color: var(--textPrimary);
 }
 
 /* I dont think we need these anymore */
@@ -231,18 +279,16 @@ html[dir="rtl"] #search #result ul > * {
 } */
 
 #search .boxes {
-  border: 1px solid var(--borderPrimary);
-  box-shadow: 0 0 5px var(--borderPrimary);
-  background: var(--surfacePrimary);
-  margin: 1em 0;
+  margin: 1.5em 0;
 }
 
 #search .boxes h3 {
-  margin: 0;
+  margin: 0 0 0.75em;
   font-weight: 500;
-  font-size: 1em;
-  color: var(--textSecondary);
-  padding: 0.5em;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--textPrimary);
 }
 
 html[dir="rtl"] #search .boxes h3 {
@@ -250,30 +296,40 @@ html[dir="rtl"] #search .boxes h3 {
 }
 
 #search .boxes > div {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  margin-right: -1em;
-  margin-bottom: -1em;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9em, 1fr));
+  gap: 0.75em;
 }
 
 #search .boxes > div > div {
-  background: var(--blue);
-  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5em;
+  padding: 1.25em 1em;
   text-align: center;
-  width: 10em;
-  padding: 1em;
   cursor: pointer;
-  margin-bottom: 1em;
-  margin-right: 1em;
-  flex-grow: 1;
+  color: var(--textSecondary);
+  background: var(--surfacePrimary);
+  border: 1px solid var(--borderPrimary);
+  border-radius: var(--radius-lg);
+  transition:
+    border-color 0.15s var(--ease),
+    background-color 0.15s var(--ease);
+}
+
+#search .boxes > div > div:hover {
+  border-color: var(--borderSecondary);
+  background: var(--surfaceSecondary);
 }
 
 #search .boxes p {
-  margin: 1em 0 0;
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 500;
 }
 
 #search .boxes i {
-  color: #fff !important;
-  font-size: 3.5em;
+  color: var(--blue) !important;
+  font-size: 2em;
 }

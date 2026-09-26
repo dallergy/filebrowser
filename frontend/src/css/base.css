@@ -1,8 +1,18 @@
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 body {
-  font-family: "Roboto", sans-serif;
+  font-family: var(--font-sans);
+  font-feature-settings: "cv11", "ss01";
+  line-height: 1.5;
   padding-top: 4em;
   background: var(--background);
   color: var(--textSecondary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 * {
@@ -16,6 +26,34 @@ body {
   outline: 0;
 }
 
+/* Keyboard users still get a visible focus indicator. */
+:focus-visible {
+  outline: 2px solid var(--blue) !important;
+  outline-offset: 2px;
+}
+
+.input:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 0 !important;
+}
+
+::selection {
+  background: var(--accent-soft-strong);
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: var(--blue);
+}
+
+h1,
+h2,
+h3 {
+  letter-spacing: -0.01em;
+}
+
 a {
   text-decoration: none;
 }
@@ -27,6 +65,28 @@ img {
 audio,
 video {
   width: 100%;
+}
+
+/* Thin, unobtrusive scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--borderSecondary) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--borderSecondary);
+  border: 3px solid transparent;
+  border-radius: 999px;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 .mobile-only {
@@ -51,6 +111,10 @@ i.spin {
   padding-bottom: 4em;
 }
 
+/* * * * * * * * * * * * * * * *
+ *           SIDEBAR           *
+ * * * * * * * * * * * * * * * */
+
 nav {
   width: 16em;
   position: fixed;
@@ -58,6 +122,9 @@ nav {
   left: 0;
   height: calc(100vh - 4em);
   overflow-y: auto;
+  padding: 0.75em 0.75em 1em;
+  display: flex;
+  flex-direction: column;
 }
 
 html[dir="rtl"] nav {
@@ -66,14 +133,44 @@ html[dir="rtl"] nav {
 }
 
 nav .action {
+  display: flex;
+  align-items: center;
+  gap: 0.75em;
   width: 100%;
-  display: block;
-  border-radius: 0;
-  font-size: 1.1em;
-  padding: 0.5em;
+  min-height: 2.375rem;
+  padding: 0.4em 0.75em;
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--textPrimary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+nav .action i {
+  padding: 0;
+  font-size: 1.25rem;
+  color: var(--textPrimary);
+  transition: color 0.15s var(--ease);
+}
+
+nav .action:hover {
+  color: var(--textSecondary);
+  background-color: var(--hover);
+}
+
+nav .action:hover i {
+  color: var(--textSecondary);
+}
+
+nav .action.active {
+  color: var(--textSecondary);
+  background-color: var(--hover);
+}
+
+nav .action.active i {
+  color: var(--blue);
 }
 
 html[dir="rtl"] nav .action {
@@ -81,6 +178,8 @@ html[dir="rtl"] nav .action {
 }
 
 nav > div {
+  margin-top: 0.5em;
+  padding-top: 0.5em;
   border-top: 1px solid var(--divider);
 }
 
@@ -88,19 +187,44 @@ nav .action > * {
   vertical-align: middle;
 }
 
+nav .credits {
+  margin: auto 0.75em 0;
+  padding-top: 1em;
+}
+
+nav .usage + .credits {
+  margin-top: 0;
+}
+
+nav .usage {
+  margin-top: auto;
+  border-top: 0;
+  padding: 1em 0.75em 0;
+  font-size: 0.75rem;
+  color: var(--textPrimary);
+}
+
+nav .usage .vue-simple-progress {
+  margin-bottom: 0.5em;
+}
+
 main {
   min-height: 1em;
-  margin: 0 1em 1em auto;
+  margin: 0 1.5em 1.5em auto;
   width: calc(100% - 19em);
 }
 
+/* * * * * * * * * * * * * * * *
+ *         BREADCRUMBS         *
+ * * * * * * * * * * * * * * * */
+
 .breadcrumbs {
-  height: 3em;
+  height: 3.25em;
   background: var(--background);
-  border-bottom: 1px solid var(--divider);
   position: sticky;
   z-index: 1000;
   top: 4em;
+  font-size: 0.875rem;
 }
 
 .breadcrumbs span,
@@ -112,8 +236,23 @@ main {
 
 .breadcrumbs a {
   color: inherit;
-  transition: 0.1s ease-in;
-  border-radius: 0.125em;
+  display: inline-flex;
+  align-items: center;
+  transition: 0.15s var(--ease);
+  border-radius: var(--radius-sm);
+}
+
+.breadcrumbs span:last-of-type a {
+  color: var(--textSecondary);
+  font-weight: 500;
+}
+
+.breadcrumbs i {
+  font-size: 1.125rem;
+}
+
+.breadcrumbs span > i {
+  color: var(--iconTertiary);
 }
 
 html[dir="rtl"] .breadcrumbs a {
@@ -121,11 +260,13 @@ html[dir="rtl"] .breadcrumbs a {
 }
 
 .breadcrumbs a:hover {
-  background-color: var(--divider);
+  color: var(--textSecondary);
+  background-color: var(--hover);
 }
 
-.breadcrumbs span a {
-  padding: 0.2em;
+.breadcrumbs span a,
+.breadcrumbs > a {
+  padding: 0.25em 0.4em;
 }
 
 .files {
@@ -139,13 +280,13 @@ html[dir="rtl"] .breadcrumbs a {
   top: 0;
   left: 0;
   width: 100%;
-  height: 3px;
+  height: 2px;
   z-index: 9999999999;
 }
 
 .progress div {
   height: 100%;
-  background-color: #40c4ff;
+  background-color: var(--blue);
   width: 0;
   transition: 0.2s ease width;
 }
@@ -156,8 +297,9 @@ html[dir="rtl"] .breadcrumbs a {
 
 .vue-number-input > input {
   background: var(--surfacePrimary) !important;
-  border-color: var(--surfaceSecondary) !important;
+  border-color: var(--borderPrimary) !important;
   color: var(--textSecondary) !important;
+  border-radius: var(--radius) !important;
 }
 
 .vue-number-input--small > input {
@@ -171,12 +313,12 @@ html[dir="rtl"] .breadcrumbs a {
 }
 
 .vue-number-input__button {
-  background: var(--surfacePrimary) !important;
+  background: transparent !important;
 }
 
 .vue-number-input__button--minus,
 .vue-number-input__button--plus {
-  border-color: var(--surfaceSecondary) !important;
+  border-color: var(--borderPrimary) !important;
 }
 
 .vue-number-input__button::before,
@@ -191,4 +333,15 @@ body > div[style*="z-index: 9990"] {
 #modal-background .button:focus {
   outline: 1px solid #2195f32d;
   outline-offset: 1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

@@ -25,8 +25,9 @@
 }
 
 .shell__content {
+  background: var(--surfacePrimary);
   height: 100%;
-  font-family: monospace;
+  font-family: var(--font-mono);
   overflow: auto;
   font-size: 1rem;
   cursor: text;

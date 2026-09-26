@@ -107,7 +107,7 @@ func resourceDeleteHandler(fileCache FileCache) handleFunc {
 			return errToStatus(err), err
 		}
 
-		err = d.store.Share.DeleteWithPathPrefix(file.Path, d.user.ID)
+		err = deleteSharesUnder(d, file.Path)
 		if err != nil {
 			log.Printf("WARNING: Error(s) occurred while deleting associated shares with file: %s", err)
 		}
@@ -153,6 +153,12 @@ func resourcePostHandler(fileCache FileCache) handleFunc {
 			Checker:    d,
 		})
 		if err == nil {
+			// Only files can be uploaded over. Writing to a directory fails, and
+			// the failure cleanup below would then remove the directory itself.
+			if file.IsDir {
+				return http.StatusBadRequest, fmt.Errorf("cannot upload to a directory %s", file.Path)
+			}
+
 			if r.URL.Query().Get("override") != "true" {
 				return http.StatusConflict, nil
 			}
@@ -179,8 +185,11 @@ func resourcePostHandler(fileCache FileCache) handleFunc {
 			return nil
 		}, "upload", r.URL.Path, "", d.user)
 
+		// Clean up the partial file. Remove, not RemoveAll: this path only ever
+		// names the single file writeFile created, and a recursive delete here
+		// would bypass Perm.Delete and the rules on anything below it.
 		if err != nil {
-			_ = d.user.Fs.RemoveAll(r.URL.Path)
+			_ = d.user.Fs.Remove(r.URL.Path)
 		}
 
 		return errToStatus(err), err
@@ -420,7 +429,17 @@ func patchAction(ctx context.Context, action, src, dst string, d *data, fileCach
 			return err
 		}
 
-		return fileutils.MoveFile(d.user.Fs, src, dst, d.settings.FileMode, d.settings.DirMode)
+		if err := fileutils.MoveFile(d.user.Fs, src, dst, d.settings.FileMode, d.settings.DirMode); err != nil {
+			return err
+		}
+
+		// Links to the old location would otherwise come back to life, serving
+		// whatever is created there next.
+		if err := deleteSharesUnder(d, src); err != nil {
+			log.Printf("WARNING: Error(s) occurred while deleting associated shares with file: %s", err)
+		}
+
+		return nil
 	default:
 		return fmt.Errorf("unsupported action %s: %w", action, fberrors.ErrInvalidRequestParams)
 	}

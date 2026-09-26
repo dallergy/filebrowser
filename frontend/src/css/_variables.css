@@ -1,74 +1,117 @@
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *  Design tokens
+ *
+ *  A neutral zinc scale carries the interface; the blue accent is reserved
+ *  for primary actions, selection and focus. Surfaces are separated by
+ *  hairline borders, and shadows are kept for things that float (dialogs,
+ *  menus, toasts).
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
 :root {
+  color-scheme: light;
+
+  --font-sans:
+    "Inter Variable", "Inter", ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono:
+    ui-monospace, "SF Mono", "JetBrains Mono", "Cascadia Code", Menlo, Consolas,
+    monospace;
+
+  /* Accent */
   --blue: #2563eb;
   --dark-blue: #1d4ed8;
-  --red: #f44336;
-  --dark-red: #d32f2f;
-  --moon-grey: #f2f2f2;
+  --accent-soft: rgba(37, 99, 235, 0.1);
+  --accent-soft-strong: rgba(37, 99, 235, 0.16);
+  --red: #dc2626;
+  --dark-red: #b91c1c;
+  --red-soft: rgba(220, 38, 38, 0.1);
+  --moon-grey: #f4f4f5;
 
-  /* 2026 refresh: shared radius + elevation tokens */
+  /* Shape */
   --radius-sm: 6px;
-  --radius: 10px;
-  --radius-lg: 16px;
-  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(15, 23, 42, 0.1);
+  --radius: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
+  /* Elevation, only for floating layers */
+  --shadow-sm: 0 1px 2px rgba(24, 24, 27, 0.05);
   --shadow-md:
-    0 2px 4px rgba(15, 23, 42, 0.06), 0 4px 12px rgba(15, 23, 42, 0.1);
+    0 1px 2px rgba(24, 24, 27, 0.04), 0 4px 12px rgba(24, 24, 27, 0.06);
   --shadow-lg:
-    0 8px 24px rgba(15, 23, 42, 0.12), 0 2px 8px rgba(15, 23, 42, 0.08);
-  --focus-ring: 0 0 0 3px rgba(37, 99, 235, 0.35);
+    0 2px 4px rgba(24, 24, 27, 0.04), 0 12px 32px rgba(24, 24, 27, 0.12);
+  --focus-ring: 0 0 0 3px rgba(37, 99, 235, 0.25);
 
-  --icon-red: #da4453;
-  --icon-orange: #f47750;
-  --icon-yellow: #fdbc4b;
-  --icon-green: #2ecc71;
-  --icon-blue: #1d99f3;
-  --icon-violet: #9b59b6;
+  --ease: cubic-bezier(0.2, 0, 0, 1);
 
-  --input-red: rgb(252, 208, 205);
-  --input-green: rgb(201, 242, 218);
+  /* File-type icon colours */
+  --icon-red: #e5484d;
+  --icon-orange: #f76b15;
+  --icon-yellow: #f5a524;
+  --icon-green: #30a46c;
+  --icon-blue: #3b82f6;
+  --icon-violet: #8e4ec6;
+
+  --input-red: #fee2e2;
+  --input-green: #dcfce7;
 
   --item-selected: white;
 
-  --action: rgb(84, 110, 122);
+  --action: #52525b;
 
-  --background: rgb(247, 248, 250);
-  --surfacePrimary: rgb(255, 255, 255);
-  --surfaceSecondary: rgb(233, 236, 240);
-  --divider: rgba(0, 0, 0, 0.05);
+  /* Neutrals */
+  --background: #fafafa;
+  --surfacePrimary: #ffffff;
+  --surfaceSecondary: #f4f4f5;
+  --surfaceTranslucent: rgba(255, 255, 255, 0.8);
+  --divider: rgba(24, 24, 27, 0.06);
   --iconPrimary: var(--icon-blue);
-  --iconSecondary: rgb(255, 255, 255);
-  --iconTertiary: rgb(204, 204, 204);
-  --textPrimary: rgb(111, 111, 111);
-  --textSecondary: rgb(51, 51, 51);
-  --hover: rgba(0, 0, 0, 0.1);
-  --borderPrimary: rgba(0, 0, 0, 0.1);
-  --borderSecondary: rgba(0, 0, 0, 0.2);
+  --iconSecondary: #ffffff;
+  --iconTertiary: #d4d4d8;
+  --textPrimary: #71717a;
+  --textSecondary: #18181b;
+  --hover: rgba(24, 24, 27, 0.05);
+  --borderPrimary: #e4e4e7;
+  --borderSecondary: #d4d4d8;
   --dividerPrimary: rgba(255, 255, 255, 0.4);
   --dividerSecondary: rgba(255, 255, 255, 0.9);
+  --overlay: rgba(9, 9, 11, 0.4);
 }
 
 :root.dark {
-  --input-red: rgb(115, 48, 45);
-  --input-green: rgb(20, 122, 65);
+  color-scheme: dark;
 
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.5);
-  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.4), 0 4px 12px rgba(0, 0, 0, 0.45);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.4);
-  --focus-ring: 0 0 0 3px rgba(96, 165, 250, 0.4);
+  --blue: #3b82f6;
+  --dark-blue: #2563eb;
+  --accent-soft: rgba(59, 130, 246, 0.14);
+  --accent-soft-strong: rgba(59, 130, 246, 0.22);
+  --red: #ef4444;
+  --dark-red: #f87171;
+  --red-soft: rgba(239, 68, 68, 0.14);
 
-  --action: rgb(255, 255, 255);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 2px 4px rgba(0, 0, 0, 0.4), 0 16px 40px rgba(0, 0, 0, 0.55);
+  --focus-ring: 0 0 0 3px rgba(59, 130, 246, 0.35);
 
-  --background: rgb(20, 29, 36);
-  --surfacePrimary: rgb(32, 41, 47);
-  --surfaceSecondary: rgb(58, 65, 71);
-  --textPrimary: rgba(255, 255, 255, 0.6);
-  --textSecondary: rgba(255, 255, 255, 0.87);
-  --divider: rgba(255, 255, 255, 0.12);
-  --iconPrimary: rgb(255, 255, 255);
-  --iconSecondary: rgb(255, 255, 255);
-  --iconTertiary: rgb(255, 255, 255);
-  --hover: rgba(255, 255, 255, 0.1);
-  --borderPrimary: rgba(255, 255, 255, 0.05);
-  --borderSecondary: rgba(255, 255, 255, 0.15);
-  --dividerPrimary: rgba(30, 30, 30, 0.4);
-  --dividerSecondary: rgba(30, 30, 30, 0.6);
+  --input-red: rgba(239, 68, 68, 0.2);
+  --input-green: rgba(34, 197, 94, 0.2);
+
+  --action: #d4d4d8;
+
+  --background: #09090b;
+  --surfacePrimary: #111113;
+  --surfaceSecondary: #1c1c1f;
+  --surfaceTranslucent: rgba(17, 17, 19, 0.8);
+  --textPrimary: #a1a1aa;
+  --textSecondary: #f4f4f5;
+  --divider: rgba(255, 255, 255, 0.06);
+  --iconPrimary: #fafafa;
+  --iconSecondary: #ffffff;
+  --iconTertiary: #52525b;
+  --hover: rgba(255, 255, 255, 0.06);
+  --borderPrimary: #27272a;
+  --borderSecondary: #3f3f46;
+  --dividerPrimary: rgba(9, 9, 11, 0.4);
+  --dividerSecondary: rgba(9, 9, 11, 0.6);
+  --overlay: rgba(0, 0, 0, 0.6);
 }

@@ -16,7 +16,7 @@
         {{ t("buttons.cancel") }}
       </button>
       <button
-        class="button button--flat"
+        class="button button--flat button--red"
         @click="layoutStore.currentPrompt?.confirm"
         tabindex="2"
       >

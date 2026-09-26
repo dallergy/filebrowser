@@ -17,6 +17,11 @@ import (
 
 const (
 	WSWriteDeadline = 10 * time.Second
+
+	// maxCommandMessageSize bounds a single message read from the command
+	// socket. A command line is short; without a limit gorilla/websocket
+	// buffers a message of any size before the handler gets to look at it.
+	maxCommandMessageSize = 64 << 10 // 64KiB
 )
 
 var upgrader = websocket.Upgrader{
@@ -45,6 +50,17 @@ var commandsHandler = withUser(func(w http.ResponseWriter, r *http.Request, d *d
 	}
 	defer conn.Close()
 
+	// Fail fast, before reading anything from a user who may not run commands.
+	if !d.server.EnableExec || !d.user.Perm.Execute {
+		if err := conn.WriteMessage(websocket.TextMessage, cmdNotAllowed); err != nil {
+			wsErr(conn, r, http.StatusInternalServerError, err)
+		}
+
+		return 0, nil
+	}
+
+	conn.SetReadLimit(maxCommandMessageSize)
+
 	var raw string
 
 	for {
@@ -58,15 +74,6 @@ var commandsHandler = withUser(func(w http.ResponseWriter, r *http.Request, d *d
 		if raw != "" {
 			break
 		}
-	}
-
-	// Fail fast
-	if !d.server.EnableExec || !d.user.Perm.Execute {
-		if err := conn.WriteMessage(websocket.TextMessage, cmdNotAllowed); err != nil {
-			wsErr(conn, r, http.StatusInternalServerError, err)
-		}
-
-		return 0, nil
 	}
 
 	command, name, err := runner.ParseCommand(d.settings, raw)

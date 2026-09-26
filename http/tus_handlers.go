@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/filebrowser/filebrowser/v2/files"
@@ -176,9 +177,52 @@ func tusHeadHandler(cache UploadCache) handleFunc {
 	})
 }
 
+// uploadLocks serializes the PATCH requests of each upload. A PATCH checks its
+// offset against the size on disk and only then writes, so two requests racing
+// through that window at the same offset would both pass the check and both
+// write, growing the file past its declared Upload-Length.
+type uploadLocks struct {
+	mu    sync.Mutex
+	locks map[string]*uploadLock
+}
+
+type uploadLock struct {
+	sync.Mutex
+	refs int
+}
+
+// lock blocks until no other request holds key, and returns the function that
+// releases it.
+func (l *uploadLocks) lock(key string) (unlock func()) {
+	l.mu.Lock()
+	if l.locks == nil {
+		l.locks = make(map[string]*uploadLock)
+	}
+	lk, ok := l.locks[key]
+	if !ok {
+		lk = &uploadLock{}
+		l.locks[key] = lk
+	}
+	lk.refs++
+	l.mu.Unlock()
+
+	lk.Lock()
+	return func() {
+		lk.Unlock()
+
+		l.mu.Lock()
+		lk.refs--
+		if lk.refs == 0 {
+			delete(l.locks, key)
+		}
+		l.mu.Unlock()
+	}
+}
+
 func tusPatchHandler(cache UploadCache) handleFunc {
+	locks := &uploadLocks{}
 	return withUser(func(w http.ResponseWriter, r *http.Request, d *data) (int, error) {
-		status, err := tusPatchUpload(w, r, d, cache)
+		status, err := tusPatchUpload(w, r, d, cache, locks)
 		// A rejected chunk is still a chunk the client is streaming: read what is
 		// left of it so the answer reaches the client on a connection that stays
 		// usable, instead of being lost to a reset.
@@ -189,7 +233,7 @@ func tusPatchHandler(cache UploadCache) handleFunc {
 	})
 }
 
-func tusPatchUpload(w http.ResponseWriter, r *http.Request, d *data, cache UploadCache) (int, error) {
+func tusPatchUpload(w http.ResponseWriter, r *http.Request, d *data, cache UploadCache, locks *uploadLocks) (int, error) {
 	if !d.user.Perm.Create || !d.Check(r.URL.Path) {
 		return http.StatusForbidden, nil
 	}
@@ -218,6 +262,17 @@ func tusPatchUpload(w http.ResponseWriter, r *http.Request, d *data, cache Uploa
 		return errToStatus(err), err
 	}
 
+	unlock := locks.lock(file.RealPath())
+	defer unlock()
+
+	// A PATCH that held the lock while this one waited may have written to the
+	// file or completed the upload, so everything below is read under the lock.
+	info, err := d.user.Fs.Stat(r.URL.Path)
+	if err != nil {
+		return errToStatus(err), err
+	}
+	file.Size = info.Size()
+
 	uploadLength, err := cache.GetLength(file.RealPath())
 	if err != nil {
 		return http.StatusNotFound, err
@@ -242,7 +297,10 @@ func tusPatchUpload(w http.ResponseWriter, r *http.Request, d *data, cache Uploa
 		)
 	}
 
-	openFile, err := d.user.Fs.OpenFile(r.URL.Path, os.O_WRONLY|os.O_APPEND, d.settings.FileMode)
+	// Not O_APPEND: the chunk must land at the offset checked above, which the
+	// seek below does, rather than wherever the end of the file is by the time
+	// it is written.
+	openFile, err := d.user.Fs.OpenFile(r.URL.Path, os.O_WRONLY, d.settings.FileMode)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("could not open file: %w", err)
 	}

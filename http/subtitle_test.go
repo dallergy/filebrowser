@@ -60,3 +60,35 @@ func TestSubtitleFileHandlerConvertsSRTBreakTags(t *testing.T) {
 		t.Fatalf("WebVTT output = %q, want converted SRT <br> tags as line breaks", body)
 	}
 }
+
+// Regression for GHSA-448h-jr2h-3vhp: conversion read the whole subtitle file
+// into memory, several times over, with no size limit, so a large .srt/.ass
+// file could exhaust server memory.
+func TestSubtitleFileHandlerRejectsOversizedFiles(t *testing.T) {
+	cue := "1\n00:00:01,000 --> 00:00:02,000\nline\n\n"
+	oversized := strings.Repeat(cue, maxSubtitleSize/len(cue)+1)
+
+	for _, name := range []string{"big.srt", "big.ass"} {
+		t.Run(name, func(t *testing.T) {
+			fs := afero.NewMemMapFs()
+			if err := afero.WriteFile(fs, "/"+name, []byte(oversized), 0o644); err != nil {
+				t.Fatal(err)
+			}
+
+			for _, size := range []int64{int64(len(oversized)), 0} {
+				// Size 0 stands in for a file that grew after it was stat'ed.
+				file := &files.FileInfo{Fs: fs, Path: "/" + name, Name: name, Size: size}
+				req := httptest.NewRequest(http.MethodGet, "/api/subtitle/"+name, http.NoBody)
+				rec := httptest.NewRecorder()
+
+				status, _ := subtitleFileHandler(rec, req, file)
+				if status != http.StatusBadRequest {
+					t.Errorf("stat size %d: status = %d; want 400", size, status)
+				}
+				if rec.Body.Len() != 0 {
+					t.Errorf("VULNERABLE: stat size %d: oversized subtitle was converted (%d bytes)", size, rec.Body.Len())
+				}
+			}
+		})
+	}
+}

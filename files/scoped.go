@@ -251,3 +251,69 @@ func (s *ScopedFs) LstatIfPossible(name string) (os.FileInfo, bool, error) {
 	}
 	return s.base.LstatIfPossible(name)
 }
+
+// ResolvePath returns the path, relative to the root of fsys, that name ends
+// up at on disk once every symbolic link along it is followed. A path that does
+// not exist yet resolves through its nearest existing ancestor, and a dangling
+// link is followed to where it points, matching where a write would land.
+//
+// ok is false when fsys is not rooted on the OS filesystem, when the path
+// cannot be resolved, or when it resolves outside the root; callers then have
+// only the lexical path to go on.
+func ResolvePath(fsys afero.Fs, name string) (resolved string, ok bool) {
+	base := BasePath(fsys)
+	if base == nil {
+		return "", false
+	}
+
+	root, err := filepath.EvalSymlinks(afero.FullBaseFsPath(base, "/"))
+	if err != nil {
+		return "", false
+	}
+
+	target := afero.FullBaseFsPath(base, name)
+	var rest []string
+	for hops := 0; ; {
+		onDisk, err := filepath.EvalSymlinks(target)
+		if err == nil {
+			rel, err := filepath.Rel(root, filepath.Join(append([]string{onDisk}, rest...)...))
+			if err != nil || rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
+				return "", false
+			}
+			if rel == "." {
+				return "/", true
+			}
+			return "/" + filepath.ToSlash(rel), true
+		}
+		if !errors.Is(err, fs.ErrNotExist) {
+			return "", false
+		}
+
+		if fi, lerr := os.Lstat(target); lerr == nil && fi.Mode()&os.ModeSymlink != 0 {
+			hops++
+			if hops > maxSymlinkHops {
+				return "", false
+			}
+			dest, rerr := os.Readlink(target)
+			if rerr != nil {
+				return "", false
+			}
+			if !filepath.IsAbs(dest) {
+				dir, derr := filepath.EvalSymlinks(filepath.Dir(target))
+				if derr != nil {
+					return "", false
+				}
+				dest = filepath.Join(dir, dest)
+			}
+			target = filepath.Clean(dest)
+			continue
+		}
+
+		parent := filepath.Dir(target)
+		if parent == target {
+			return "", false
+		}
+		rest = append([]string{filepath.Base(target)}, rest...)
+		target = parent
+	}
+}

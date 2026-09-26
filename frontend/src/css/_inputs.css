@@ -1,28 +1,42 @@
 .input {
-  background: var(--surfacePrimary);
-  color: var(--textSecondary);
-  border: 1px solid var(--borderPrimary);
-  border-radius: 0.1em;
-  padding: 0.5em 1em;
-  transition: 0.2s ease all;
+  min-height: 2.25rem;
   margin: 0;
+  padding: 0.45em 0.75em;
+  font: inherit;
+  font-size: 0.875rem;
+  color: var(--textSecondary);
+  background: var(--surfacePrimary);
+  border: 1px solid var(--borderPrimary);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  transition:
+    border-color 0.15s var(--ease),
+    box-shadow 0.15s var(--ease);
 }
 
-.input:hover,
-.input:focus {
+.input::placeholder {
+  color: var(--textPrimary);
+}
+
+.input:hover {
   border-color: var(--borderSecondary);
 }
 
+.input:focus {
+  border-color: var(--blue);
+  box-shadow: var(--focus-ring);
+}
+
 .input--block {
-  margin-bottom: 0.5em;
   display: block;
   width: 100%;
+  margin-bottom: 0.625em;
 }
 
 .input--textarea {
-  line-height: 1.15;
-  font-family: monospace;
   min-height: 10em;
+  font-family: var(--font-mono);
+  line-height: 1.5;
   resize: vertical;
 }
 
@@ -32,4 +46,8 @@
 
 .input--green {
   background: var(--input-green) !important;
+}
+
+select.input {
+  padding-right: 2em;
 }
