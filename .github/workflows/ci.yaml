@@ -22,11 +22,11 @@ jobs:
     name: Lint Frontend
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
         with:
           package_json_file: "frontend/package.json"
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: "24.x"
           cache: "pnpm"
@@ -40,11 +40,11 @@ jobs:
     name: Test Frontend
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
         with:
           package_json_file: "frontend/package.json"
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: "24.x"
           cache: "pnpm"
@@ -59,10 +59,11 @@ jobs:
     name: Lint Backend
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-go@v6
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
         with:
           go-version: "1.27.x"
+          check-latest: true
       - uses: golangci/golangci-lint-action@v9
         with:
           version: "latest"
@@ -84,26 +85,30 @@ jobs:
         # The minimum version from go.mod and the current release.
         go: ["1.26.x", "1.27.x"]
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-go@v6
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
         with:
           go-version: ${{ matrix.go }}
+          # The runner image can already have an older patch cached. Without
+          # this, 1.26.x stayed on 1.26.9 and could not satisfy go.mod.
+          check-latest: true
       - run: go test --race ./...
 
   build:
     name: Build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - uses: actions/setup-go@v6
+      - uses: actions/setup-go@v7
         with:
           go-version: "1.27.x"
+          check-latest: true
       - uses: pnpm/action-setup@v6
         with:
           package_json_file: "frontend/package.json"
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: "24.x"
           cache: "pnpm"
@@ -145,7 +150,7 @@ jobs:
     env:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKER_USERNAME || vars.DOCKER_USERNAME }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Tag the release
@@ -161,13 +166,14 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git tag -a "v$VERSION" -m "v$VERSION"
           git push origin "v$VERSION"
-      - uses: actions/setup-go@v6
+      - uses: actions/setup-go@v7
         with:
           go-version: "1.27.x"
+          check-latest: true
       - uses: pnpm/action-setup@v6
         with:
           package_json_file: "frontend/package.json"
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: "24.x"
           cache: "pnpm"
